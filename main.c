@@ -5,7 +5,7 @@
 #include <math.h>
 #include <time.h>
 
-int order(unsigned long long k){
+int order(unsigned long long k){//возвращает длину числа
     int z = 0;
     do {
     k = k/10;
@@ -14,7 +14,7 @@ int order(unsigned long long k){
     while(k>=1);
     return z;
 }
-unsigned long long rndom(int m){
+unsigned long long rndom(int m){//возвращает случайное число заданной длины
     unsigned long long rnd,rndm;
     unsigned long long maximum;
     unsigned long long minimum;
@@ -33,44 +33,58 @@ int main(void)
    srand(time(NULL));
    unsigned long long x,f;// вводимое угадываемое число
    unsigned long long y,w;// загадываемое число
-   unsigned int m, n, p=0, b, c;
+   unsigned int m, n, p=0, b, c;//быки, коровы, попытки...
+   int readout =0;// возврат от сканф-а
+   char answ[2];
    printf("Привет! Сыграем в отгадывание числа?\nИгра называется <<Быки и Коровы>>.\n");
    printf("Я загадаю число, и буду давать подсказки.\n");
    printf("Угаданная цифра в числе - <<бык>>, а если нет, то - <<корова>>.\n");
-   printf("Скольки-значное число будем отгадывать?\n");
+   printf("Числа - целые, положительные. Нули слева не воспринимаются.\n");
+   printf("\nСкольки-значное число будем отгадывать?\n");
    do{
-       printf("Введите число от 3-х до 10-ти:\n");
-       scanf ("%llu", &m);
-       if(m<3 || m>10){
+       printf("Введите число от 3-х до 10-ти: ");
+       readout = scanf ("%u", &m);
+       printf("\n");
+       if(m<3 || m>10 || readout ==0){
           printf("Неверное число!\n");
+          while(getchar() != '\n');
        }
+
    }
-   while(m<3 || m>10);
+   while(m<3 || m>10 || readout ==0);
+    readout = 0;
+    y=rndom(m);//загадываем число))
 
-    y=rndom(m);
 
-
-    printf("y= %llu\n",y);
+    //printf("y= %llu\n",y);//шпаргалка для отладки
 
     printf("Отлично! Я загадал %d - значное число.\nПопробуйте отгадать)))\n",m);
 
-    do{
+    do{// основной цикл программы
 
 
-     do{
-        printf("Введите ваше %d - значное число:\n",m);
-        scanf ("%llu", &x);
-        n=order(x);
-        if(m!=n){
-            printf("Неверное число!\n");
+     do{//цикл ввода числа с проверкой на валидность
+        printf("Введите ваше %d - значное число: ",m);
+        readout = scanf ("%llu", &x);
+        printf("\n");
+        if(readout!=0){
+            n=order(x);
+            if(m!=n){
+                printf("Неверное число!\n");
 
-            if (m < n){
-             printf("Превышено кол-во цифр!\n");
+                if (m < n){
+                printf("Превышено кол-во цифр!\n");
+                }
+                 else{
+                printf("Недостаточное кол-во цифр!\n");
+                 }
             }
-            else{
-            printf("Недостаточное кол-во цифр!\n");
-            }
-         }
+        }
+        else{
+          printf("Неверные данные!\n");
+          n=0;
+          while(getchar() != '\n');
+        }
      }
      while(m!=n);
 
@@ -85,14 +99,14 @@ int main(void)
     else{
         c=0;
         b=0;
-        for(int i = (m-1); i>=0;){
+        for(int i = (m-1); i>=0;){//этот цикл разбирает число на циферки
             unsigned long long e = ((unsigned long long)pow(10, i));
             int a = f/e;
             f = f%e;
             int g = w/e;
             w = w%e;
 
-            printf("%d : %d\n",a,g);
+            //printf("%d : %d\n",a,g);//для отладки. наглядно.
 
             if(a==g){
                 b=b+1;
@@ -105,6 +119,23 @@ int main(void)
         printf("Вы не угадали.\n");
         printf("У вас быков: %d, и коров: %d \n",b,c);
 
+        do{
+            answ[0]='\0';
+            //while(getchar() != '\n');
+            printf("\nПродолжим? (y/n): ");//если юзеру надоест отгадывать))
+            scanf(" %1[yYnN]", answ);
+            while(getchar() != '\n');
+        }
+        while (answ[0] !='y' && answ[0] !='Y' && answ[0] !='n' && answ[0]!='N');
+
+        //printf("answ=%c\n",answ[0]);
+
+
+        if(answ[0] =='n'||answ[0] =='N'){
+            printf("Игра завершена.\n");
+            break;
+        }
+
     }
     }
     while(x!=y);
@@ -112,6 +143,9 @@ int main(void)
 
     printf("Количество попыток: %d \n",p);
     printf("Загаданное мной число: %llu\n",y);
+    printf("Для выхода нажмите Enter. \n");
+    getchar();
+    getchar();//это чтоб экзешник не захлопнулся сразу
     return 0;
 }
 
