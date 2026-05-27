@@ -33,12 +33,15 @@ int main(void)
    srand(time(NULL));
    unsigned long long x,f;// вводимое угадываемое число
    unsigned long long y,w;// загадываемое число
-   unsigned int m, n, p=0, b, c;//быки, коровы, попытки...
+   unsigned int m, n, ch=0, p=0, b, c;//быки, коровы, попытки...
+   int x_arr[10]={0};
+   int y_arr[10]={0};
    int readout =0;// возврат от сканф-а
+
    char answ[2];
    printf("Привет! Сыграем в отгадывание числа?\nИгра называется <<Быки и Коровы>>.\n");
    printf("Я загадаю число, и буду давать подсказки.\n");
-   printf("Угаданная цифра в числе - <<бык>>, а если нет, то - <<корова>>.\n");
+   printf("Угаданная цифра в числе - <<бык>>, угаданная, но не на своем месте- <<корова>>.\n");
    printf("Числа - целые, положительные. Нули слева не воспринимаются.\n");
    printf("\nСкольки-значное число будем отгадывать?\n");
    do{
@@ -64,7 +67,7 @@ int main(void)
 
 
      do{//цикл ввода числа с проверкой на валидность
-        printf("Введите ваше %d - значное число: ",m);
+        printf("\nВведите ваше %d - значное число: ",m);
         readout = scanf ("%llu", &x);
         printf("\n");
         if(readout!=0){
@@ -87,9 +90,11 @@ int main(void)
         }
      }
      while(m!=n);
+     while(getchar() != '\n');//чистим буфер чтения клавы
 
     //printf("Номер %d - значный.\n",n);
     p = p + 1;
+    ch = ch+1;
     f=x;
     w=y;
     if(x==y){
@@ -99,42 +104,60 @@ int main(void)
     else{
         c=0;
         b=0;
-        for(int i = (m-1); i>=0;){//этот цикл разбирает число на циферки
+        for(int i = (m-1); i>=0;){//этот цикл разбирает число на циферки и пакует их в массивы.
             unsigned long long e = ((unsigned long long)pow(10, i));
             int a = f/e;
             f = f%e;
             int g = w/e;
             w = w%e;
+            x_arr[i]=a;
+            y_arr[i]=g;
 
             //printf("%d : %d\n",a,g);//для отладки. наглядно.
 
-            if(a==g){
-                b=b+1;
-            }
-            else{
-                c=c+1;
-            }
+            //if(a==g){
+                //b=b+1;
+            //}
+            //else{
+                //c=c+1;
+            //}
           i=i-1;
           }
+        for(int i =(m-1); i>=0;){//в этом цикле происходит поэлементное сравнение двух массивов.
+            for(int j=(m-1); j>=0;){
+                if((x_arr[i] == y_arr[j])&&(i==j)){
+                    b=b+1;
+                }
+                else if((x_arr[i] == y_arr[j])&&(i!=j)){
+                    c=c+1;
+                }
+                j=j-1;
+            }
+            i=i-1;
+        }
         printf("Вы не угадали.\n");
         printf("У вас быков: %d, и коров: %d \n",b,c);
 
-        do{
-            answ[0]='\0';
-            //while(getchar() != '\n');
-            printf("\nПродолжим? (y/n): ");//если юзеру надоест отгадывать))
-            scanf(" %1[yYnN]", answ);
-            while(getchar() != '\n');
-        }
-        while (answ[0] !='y' && answ[0] !='Y' && answ[0] !='n' && answ[0]!='N');
+        if(ch==3){// спрашиваем не каждый проход))
 
-        //printf("answ=%c\n",answ[0]);
+            do{
+                answ[0]='\0';
+                //while(getchar() != '\n');
+                printf("\nПродолжим? (y/n): ");//если юзеру надоест отгадывать))
+                scanf(" %1[yYnN]", answ);
+                while(getchar() != '\n');
+            }
+            while (answ[0] !='y' && answ[0] !='Y' && answ[0] !='n' && answ[0]!='N');
+
+            //printf("answ=%c\n",answ[0]);
 
 
-        if(answ[0] =='n'||answ[0] =='N'){
-            printf("Игра завершена.\n");
-            break;
-        }
+            if(answ[0] =='n'||answ[0] =='N'){
+                printf("\nИгра завершена.\n");
+                break;
+            }
+            ch = 0;
+          }
 
     }
     }
@@ -144,7 +167,7 @@ int main(void)
     printf("Количество попыток: %d \n",p);
     printf("Загаданное мной число: %llu\n",y);
     printf("Для выхода нажмите Enter. \n");
-    getchar();
+    //getchar();
     getchar();//это чтоб экзешник не захлопнулся сразу
     return 0;
 }
